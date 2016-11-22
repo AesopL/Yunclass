@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+	<head>
+
+		<meta charset="UTF-8">
+		<title>萌新登陆</title>
+		<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/Yunclass/public/static/admin/css/login.css" />
+		<link rel="stylesheet" href="/Yunclass/public/static/jquery-validation/css/validationEngine.jquery.css" />
+	</head>
+
+	<body>
+		<div class="container main">
+			<div class="title">
+				<span id="" class="login">
+					<p>登陆</p>
+				</span>
+			</div>
+			<div class="form">
+				<form id="form_login" action="{:url('login')}" method="post">
+
+					<input type="text" name="username" id="username" class="inputW form-control " placeholder="用户名" autocomplete="off" />
+
+					<input type="password" id="password" name="password" class="inputW form-control " data-errormessage-value-missing="密码不能小于五位" placeholder="密码" autocomplete="off">
+					<div class="row captchas">
+						<div id="" class="col-md-8">
+							<input placeholder="请输入验证码" name="captcha" class=" inputW form-control" autocomplete="off"></input>
+						</div>
+						<div class="col-md-4">
+							<img src="{:captcha_src()}" alt="captcha" onclick="this.src='{:captcha_src()}'" class="captcha" />
+						</div>
+
+					</div>
+					<input type="hidden" name="check">
+					<div id="" class="row sub">
+						<div class="">
+							<button type="submit" class="btn btn-success">登陆</button>
+							<button type="reset" class="btn btn-info">取消</button>
+						</div>
+
+					</div>
+
+				</form>
+			</div>
+		</div>
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="/Yunclass/public/static/layui/layui.js"></script>
+		<script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+		<script src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
+
+		<script>
+			$().ready(function() {
+				// 在键盘按下并释放及提交后验证提交表单
+				$("#form_login").validate({
+					onkeyup: false,
+					//验证规则
+					rules: {
+						name: {
+							required: true,
+							minlength: 2
+						},
+						password: {
+							required: true,
+							minlength: 5
+						},
+
+						email: {
+							required: true,
+							email: true
+						},
+						captcha: {
+							required: true,
+							remote: {
+								url: "valicap", //后台处理程序
+								type: "post", //数据发送方式
+								dataType: "json", //接受数据格式   
+								data: { //要传递的数据
+									username: function() {
+										return $("#captcha").val();
+									}
+								}
+							}
+						}
+
+					},
+
+					//提示信息
+					messages: {
+						username: {
+							required: "请输入用户名",
+							minlength: "用户名必需由两个字母组成"
+						},
+						password: {
+							required: "请输入密码",
+							minlength: "密码长度不能小于 5 个字母"
+						},
+
+						email: "请输入一个正确的邮箱",
+						captcha: {
+							required: "验证码不能为空",
+							remote: "验证码错误,刷新一下验证码再输入吧"
+						}
+
+					},
+
+					/*执行ajaxsubmit  */
+					submitHandler: function() {
+						var username = $("#username").val();
+						var psw = $("#password").val();
+						$.ajax({
+							type: "post",
+							url: "login",
+							async: true,
+							data: {
+								username: username,
+								psw: psw,
+							},
+							success: function(data) {
+								alert(data);
+								layui.use("layer", function() {
+									var $ = layui.jquery,
+										layer = layui.layer;
+									//成功后跳出提示
+									layer.msg('登录成功', {
+										icon: 1,
+										time: 2000 //2秒关闭（如果不配置，默认是3秒）
+									}, function() {
+										//do something
+										location.href="{:url('teacher/index')}"
+									});
+
+								});
+							}
+						});
+						return false;
+					},
+
+					invalidHandler: function() {
+						return false;
+					},
+
+				});
+			})
+		</script>
+	</body>
+
+</html>

@@ -3,18 +3,17 @@ namespace app\index\controller;
 use think\controller;
 use think\request;
 
-class Teacher extends Controller {
+class Teacher extends Index {
 	public function index() {
-		try {
-			$teachers = \app\index\model\Teacher::show();
-			$this -> assign('list', $teachers);
-			return $this -> fetch();
-		} catch(\Exception $e) {
-			// 由于对异常进行了处理，如果发生了错误，我们仍然需要查看具体的异常位置及信息，那么需要将以下代码的注释去掉。
-			// throw $e;
-			return '系统错误' . $e -> getMessage();
-		}
+		//判断是否存在登录
+//      if (!Teacher::islogin())
+//      {
+//          return $this->error('请重新登录', url('Login/index'));
+//      }
 
+		$teachers = \app\index\model\Teacher::show();
+		$this -> assign('list', $teachers);
+		return $this -> fetch();
 	}
 
 	public function add() {
@@ -116,10 +115,10 @@ class Teacher extends Controller {
 	public function search() {
 		return $this -> fetch("opensearch");
 	}
-	
-	public function searchlist(){
+
+	public function searchlist() {
 		$name = Request::instance() -> Post('name');
-		if(!$name){
+		if (!$name) {
 			return false;
 		}
 		$teachers = \app\index\model\Teacher::search($name);

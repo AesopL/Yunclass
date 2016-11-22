@@ -48,11 +48,11 @@ class Teacher extends \think\model{
 	
 	public static function edit($id){
 		$res = Teacher::get($id);
-		 if (null === $res )
-            {
+		if (null === $res )
+		{
                 // 由于在$this->error抛出了异常，所以也可以省略return(不推荐)
-                $this->error('系统未找到ID为' . $id . '的记录');
-            } 
+			$this->error('系统未找到ID为' . $id . '的记录');
+		} 
 		//$res = Teacher::get($id);
 		return $res;
 	}
@@ -86,6 +86,62 @@ class Teacher extends \think\model{
 		
 	}
 	
+	//密码验证
+	public static function logining($username,$password){
+		$map = ['username'=>$username];
+		$validate = new Validate( [
+			'username'  => 'require|length:2,25',
+			]);
+			//var_dump($map);
+		if($validate->check($map)){
+				//获取用户信息
+			$Teacher = self::get($map);
+			if(!is_null($Teacher)){
+				if($Teacher->chackpassword($password)){
+				//验证通过设定session
+					session('teacherId', $Teacher->getData('id'));
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	//密码验证
+	public function chackpassword($password){
+		if($this->getData("psw")===$this::encryptPassword($password)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	//密码加密
+	public static function encryptPassword($password)
+	{
+		if (!is_string($password)) {
+            throw new \RuntimeException("传入变量类型非字符串，错误码2", 2);
+        }   
+        // 实际的过程中，我还还可以借助其它字符串算法，来实现不同的加密。
+		return sha1(md5($password) . 'yunlala');
+	}
+	
+	//登出
+	public static function logouting(){
+		session('teacherId',null);
+		return true;
+	}
+	
+	//登录状态验证
+	public static function islogin(){
+		$teacherId = session('teacherId');
+		if(isset($teacherId)){
+			return true;
+		}else{
+			return false;
+		}
+	}
 	
 }
 

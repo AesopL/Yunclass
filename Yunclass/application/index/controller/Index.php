@@ -1,14 +1,23 @@
 <?php
 namespace app\index\controller;
-use think\db;
+use think\controller;
+use app\index\model\Teacher;
 
-class Index
-{
-    public function index()
-    {
-       //var_dump(Db::name('teacher')->find());
-       //获取表中所有元素
-	   $teacher=Db::name('teacher')->select();
-	   var_dump($teacher);
-      }
+class Index extends controller{
+	
+	//构造函数进行验证登录
+	public function __construct() {
+		// 调用父类构造函数(必须)
+		parent::__construct();
+
+		// 验证用户是否登陆
+		if (!Teacher::islogin()) {
+			return $this -> error('请重新登录',url('login/index'));
+		}
+	}
+	
+	public function index(){
+		
+	}
+
 }
