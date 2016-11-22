@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+		<link rel="stylesheet" type="text/css" href="/yunclass/public/static/layui/css/layui.css" />
+		<title></title>
+	</head>
+
+	<body>
+		<div id="" class="container" style="margin-top: 20px;">
+			<div class="row">
+				<div class="col-md-8">
+					<!--<form class="form-inline" action="opensearch" method="post">-->
+					<div class="form-group">
+						<label class="sr-only" for="name">姓名</label>
+						<input id="search" name="name" type="text" class="form-control" placeholder="姓名...">
+						<button onclick="search()" type="submit" class="layui-btn layui-btn-normal form-control"><i class="glyphicon glyphicon-search"></i>&nbsp;查询</button>
+
+					</div>
+					<!--</form>-->
+				</div>
+			</div>
+			<div class="row">
+				<div class="layui-field-box" id="teacherlist">
+
+				</div>
+			</div>
+		</div>
+
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="/Yunclass/public/static/layui/layui.js"></script>
+		<script>
+			function search() {
+
+				var name = $("#search").val();
+				$.ajax({
+					type: "post",
+					url: "{:url('teacher/searchlist')}",
+					async: true,
+					data: {
+						name: name,
+					},
+					success: function(data) {
+							//alert(typeof data);
+							console.log(data);
+							//判断是否有数据
+							if(data == '') {
+								layui.use('layer', function() {
+									var $ = layui.jquery,
+										layer = layui.layer;
+									layer.msg("没查到哟");
+								});
+							} else {
+								layui.use('layer', function() {
+									//得到弹出页面索引
+									var index = parent.layer.getFrameIndex(window.name);
+									//数据table拼接
+									var html = '<table class="table table-hover"><thead class="striped-top"><tr><th>姓名</th><th class="right">性别</th><th class="right">用户名</th><th class="right">邮箱</th></tr></thead><tbody>';
+
+									for(var i = 0; i < data.length; i++) {
+										//alert(data[i].sex);
+										//console.log(data[i].name);
+										if(data[i].sex == 1) {
+											data[i].sex = "男";
+										} else {
+											data[i].sex = "女";
+										}
+										//数据写入表格
+										html += "<tr><td>" + data[i].name + "</td><td>" + data[i].sex + "</td><td>" + data[i].username + "</td><td>" + data[i].email + "</td></tr>";
+									}
+									html += "</tbody></table>";
+									//页面数据展示
+									$('#teacherlist').html(' ').html(html);
+									//设定页面为自适应
+									parent.layer.iframeAuto(index);
+								});
+							}
+						}
+						//var num = data.indexOf('[');
+						//alert(data.data['0'].name);
+						//截取需要的json字符串
+						//var teacherstr = data.substring(num, data.length);
+						//console.log(teacherstr);
+						//var teachers;
+						//将json字符串转为json对象
+						//eval("teachers=" + teacherstr);
+						//console.log(teachers);
+						//console.log(teachers[1].name);
+
+				});
+			}
+		</script>
+	</body>
+
+</html>

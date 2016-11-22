@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>新增数据</title>
+		<!-- 新 Bootstrap 核心 CSS 文件 -->
+		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+		<link rel="stylesheet" type="text/css" href="/yunclass/public/static/layui/css/layui.css" />
+	</head>
+
+	<body class="container">
+
+		<div class="row" style="margin-top: 15px;">
+			<!--<form class="layui-form" action="add_post" method="post">-->
+			<div class="layui-form-item">
+				<label class="layui-form-label">姓名</label>
+				<div class="layui-input-inline">
+					<input type="text" id="name" name="name" lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">用户名</label>
+				<div class="layui-input-inline">
+					<input type="text" id="username" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">性别</label>
+				<div class="layui-input-block">
+					<input type="radio" name="sex" value="1" title="男" checked>男
+					<input type="radio" name="sex" value="0" title="女">女
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">邮箱</label>
+				<div class="layui-input-inline">
+					<input type="text" id="email" name="email" lay-verify="email" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button onclick="addpost()" class="layui-btn" lay-submit lay-filter="formDemo">提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			<!--</form>-->
+		</div>
+
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="/phpdemo/public/static/layui/layui.js"></script>
+		<script>
+			function addpost() {
+				var name = $('#name').val();
+				var sex = $('input[name="sex"]:checked').val();
+				var username = $('#username').val();
+				var email = $('#email').val();
+				var addurl = '{:url("teacher/add_post")}';
+				$.ajax({
+					type: "post",
+					url: "",
+					async: true,
+					url: addurl,
+					data: {
+						name: name,
+						sex: sex,
+						username: username,
+						email: email,
+					},
+					success: function(data) {
+						alert(data);
+						layui.use("layer", function() {
+							var $ = layui.jquery,
+								layer = layui.layer;
+							//							layer.msg("添加成功咯，还要添加吗？", {
+							//								time: 0, //不自动关闭
+							//								btn: ['必须啊', '算了'],
+							//								yes: function() {
+							//									layer.close();
+							//									location.reload();
+							//								},
+							//								btn2:function(){
+							//									layer.close();
+							//									parent.close();
+							//								}
+							//							});
+
+							layer.confirm('添加成功了，还要继续添加吗？', {
+								btn: ['必须啊', '算了'] //按钮
+							}, function() {
+								layer.close();
+								location.reload();
+							}, function() {
+								var index = parent.layer.getFrameIndex(window.name);
+								parent.layer.close(index);
+							});
+						});
+					}
+				});
+				layui.use(['form', 'layedit', 'laydate'], function() {
+					//				var form = layui.form(),
+					//					layer = layui.layer,
+					//					layedit = layui.layedit,
+					//					laydate = layui.laydate;
+
+					//监听提交
+					//				form.on('submit(formDemo)', function(data) {
+					//					layer.alert(JSON.stringify(data.field), {
+					//						title: '最终的提交信息'
+					//					})
+					//					return false;
+					//				});
+
+				});
+			}
+		</script>
+	</body>
+
+</html>

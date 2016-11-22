@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+	<head>
+		<meta charset="UTF-8">
+		<!-- 新 Bootstrap 核心 CSS 文件 -->
+		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+		<link rel="stylesheet" type="text/css" href="/yunclass/public/static/layui/css/layui.css" />
+
+		<title></title>
+	</head>
+
+	<body style="background-color: #5FB878;">
+		<div class="container">
+			<button onclick="opensearch()" class="layui-btn layui-btn-radius layui-btn-small"> <i class="layui-icon">&#xe615;</i> 查询</button>
+			<button id="add" class="layui-btn layui-btn-radius layui-btn-small"> <i class="layui-icon">&#xe608;</i> 添加</button>
+
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-condensed table-hover" border="" cellspacing="" cellpadding="">
+						<tr class="layui-bg-gray">
+							<th>序号</th>
+							<th>姓名</th>
+							<th>性别</th>
+							<th>用户名</th>
+							<th>邮箱</th>
+							<th>操作</th>
+						</tr>
+						{volist name="list" id="vo" key="key"}
+						<tr id="item{$vo.id}">
+							<td>{$key}</td>
+							<td>{$vo.name}</td>
+							<td>{eq name='$vo.sex' value='1'}男{else}女{/eq}</td>
+							<td>{$vo.username}</td>
+							<td>{$vo.email}</td>
+							<td>
+								<!--<a id="" href="{:url('editrow?id='.$vo.id)}" class="layui-btn layui-btn-small layui-btn-normal">编辑</a> &nbsp;-->
+								<button onclick="editrow({$vo.id})" class="layui-btn layui-btn-normal layui-btn-mini">编辑</button>&nbsp;｜
+								<button onclick="deletem({$vo.id})" class="layui-btn layui-btn-danger layui-btn-mini">删除</button>
+								<!--<a href="deleterow?id={$vo.id}" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>-->
+							</td>
+						</tr>
+						{/volist}
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+				</div>
+				<div class="col-md-4">
+					{$list->render()}
+				</div>
+				<div class="col-md-4">
+				</div>
+			</div>
+
+		</div>
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="/Yunclass/public/static/layui/layui.js"></script>
+		<script>
+			//弹出添加页面
+			$('#add').on('click', function() {
+
+				layui.use('layer', function() {
+					var $ = layui.jquery,
+						layer = layui.layer;
+
+					layer.open({
+						type: 2,
+						skin: 'layui-layer-lan',
+						title: '添加一个新留言',
+						area: ['400px', '350px'],
+						content: ['{:url("add")}', 'no'],
+					});
+				});
+			});
+			//删除方法
+			function deletem(id) {
+				//				var $tr =$("#item")+id;
+				//				alert($tr);
+				layui.use('layer', function() {
+					var $ = layui.jquery,
+						layer = layui.layer;
+					layer.confirm('确定要删除吗?', {
+						icon: 3,
+						title: '提示'
+					}, function(index) {
+						//alert(name);
+						//do something
+						$.ajax({
+							type: "post",
+							url: "{:url('deleterow')}",
+							async: true,
+							data: {
+								"id": id,
+							},
+							success: function() {
+
+								layer.msg('删除成功');
+								$("#item" + id).fadeOut("slow");
+							}
+						});
+						layer.close(index);
+					})
+				});
+			}
+			//弹出编辑页面
+			function editrow(id) {
+				layui.use('layer', function() {
+					var $ = layui.jquery,
+						layer = layui.layer;
+
+					var url = '{:url("teacher/editrow")}?id=' + id;
+					//alert(url);
+					layer.open({
+						type: 2,
+						skin: 'layui-layer-molv',
+						title: '编辑',
+						area: ['400px', '350px'],
+						content: [url, 'no'],
+					})
+				})
+			}
+			//弹出查询页面
+			function search() {
+
+				layui.use('layer', function() {
+					var $ = layui.jquery,
+						layer = layui.layer;
+				
+					layer.open({
+						title: "查询",
+						content: '<div><lable><i class="layui-icon">&#xe615;</i></lable><input id="searchname" style="width:200px" type="text" placeholder="输入姓名查询"></div>',
+						btn: ['确定', '取消'],
+						area: ['250px', '160px'],
+						yes: function(index, layero) {
+							//按钮【按钮一】的回调
+							var searchname = $("#searchname").val();
+							$.ajax({
+								type: "post",
+								url: "teacher/search",
+								async: true,
+								data: {
+									"name": searchname,
+								},
+								success: function(data) {
+									console.log(data);
+									layer.open({
+										type: 2,
+										skin: 'layui-layer-molv',
+										resize: true,
+										title: '结果',
+										area: ['400px', '350px'],
+										content: ["teacher/search", 'no'],
+									});
+								}
+							});
+						},
+						btn2: function(index, layero) {
+							//按钮【按钮二】的回调
+							layer.close(index);
+						},
+						cancel: function() {
+							//右上角关闭回调
+						}
+					});
+					
+				});
+			}
+
+			function opensearch() {
+
+				var url = "{:url('search')}";
+				layui.use('layer', function() {
+					var $ = layui.jquery,
+						layer = layui.layer;
+					layer.open({
+						title: '查询',
+						type: 2,
+						skin: 'layui-layer-molv',
+						area: ['700px', '400px'],
+						content: [url, 'no'],
+					});
+				});
+			}
+		</script>
+	</body>
+
+</html>

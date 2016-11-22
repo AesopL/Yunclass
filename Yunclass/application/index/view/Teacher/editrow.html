@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+		<link rel="stylesheet" type="text/css" href="/yunclass/public/static/layui/css/layui.css" />
+		<title></title>
+	</head>
+
+	<body>
+		<div class="container">
+			<!--star form-->
+		
+				<div class="row">
+					<!--<input type="hidden" name="id" id="key" value="{$Teacher->getData('id')}" />-->
+					<div class="layui-form-item">
+						<label class="layui-form-label">姓名</label>
+						<div class="layui-input-inline">
+							<input id="name" type="text" name="name"  placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{$Teacher->getData('name')}" required="required">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">用户名</label>
+						<div class="layui-input-inline">
+							<input id="username" type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{$Teacher->getData('username')}">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">性别</label>
+						<div class="layui-input-block">
+							<!--<input type="radio" name="sex" value="1" title="男">
+							<input type="radio" name="sex" value="0" title="女" checked>-->
+							{eq name="Teacher->getData('sex')" value='1')}
+							<input type="radio" name="sex" value="1" title="男" checked>男
+							<input type="radio" name="sex" value="0" title="女">女 {else/}
+							<input type="radio" name="sex" value="1" title="男">男
+							<input type="radio" name="sex" value="0" title="女" checked>女 {/eq}
+
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">邮箱</label>
+						<div class="layui-input-inline">
+							<input id="email" type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input" value="{$Teacher->getData('email')}">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button onclick="editp({$Teacher->getData('id')})" class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+							<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+						</div>
+					</div>
+
+				</div>
+		
+			<!--end form-->
+		</div>
+
+		<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="/phpdemo/public/static/layui/layui.js"></script>
+		<script>
+			layui.use(['form', 'layedit', 'laydate'], function() {
+			});
+
+			function editp(id) {
+				//获取数据
+				var sex = $('input[name="sex"]:checked').val();
+				var name = $('#name').val();
+				//alert(name);
+				var username = $('#username').val();
+				var email = $('#email').val();
+
+				//执行ajax操作
+				$.ajax({
+					type: "post",
+					url: "edit_post?id=" + id,
+					async: true,
+					data: {
+						"name": name,
+						"sex": sex,
+						"username": username,
+						"email": email,
+					},
+					//成功后执行layer弹窗提示
+					success: function(data) {
+						layui.use('layer', function() {
+							layer.msg('修改成功', {
+								icon: 1,
+								anim: 4,
+								time: 2000 //2秒关闭（如果不配置，默认是3秒）
+							}, function() {
+								//do something
+								var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+								parent.layer.close(index); //再执行关闭 
+
+							});
+						});
+						//parent.$("#name").val(name);
+						//var p = parent.layer.getFrameIndex(window.name);
+						//alert(parent.$('#item'+id));
+						//parent.$('#item' + id).find('td').eq(1).text(name);
+
+						//获取每个单元格的前缀key
+						var keynum = parent.$('#item' + id).find('td').eq(0).text();
+						//var tdrow= parent.$('#item' + id).find('td').not(1);
+						//将性别数字改变为string
+						var sex1 = (sex == 1) ? "男" : "女";
+						var data = [keynum, name, sex1, username, email];
+						for(var i = 0; i < data.length; i++) {
+							console.log(data[i]);
+							parent.$('#item' + id).find('td').eq(i).text(data[i]).fadeIn(4000);
+						}
+					},
+					error:function(data){
+						layui.use('layer', function() {
+							layer.msg('修改失败啦，仔细检查下', {
+								icon: 2,
+								anim: 6,
+								time: 2000 //2秒关闭（如果不配置，默认是3秒）
+							});
+						});
+
+					}
+					
+				});
+			}
+			
+		</script>
+
+	</body>
+
+</html>
